@@ -141,6 +141,7 @@ func htmlMake(content: String) -> String {
     <meta name="viewport" content="width=device-width,initial-scale=1.33,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
     <title>详情</title>
     <style type="text/css">
+    
     body {
     font-family: 'PingFangSC-Regular';
     margin:0;
@@ -161,62 +162,10 @@ func htmlMake(content: String) -> String {
     box-sizing: border-box;
     }
     
-    .detail .title {
-    font-size: 22px;
-    line-height: 30px;
-    text-align: left;
-    padding-top: 10px;
-    max-height: 60px;
-    overflow: hidden;
-    }
-    
-    .detail .subTitle span {
-    font-size: 12px;
-    padding-right: 3%;
-    color: #808080;
-    }
-    
-    .detail .content {
-    overflow: hidden;
-    width: 100%;
-    word-break: break-all;
-    position: relative;
-    font-size: 14.5px;
-    color: rgb(51,51,51);
-    }
-    
-    .detail .content *{
-    line-height: 1.75;
-    }
-    
-    .contentimg{
+    .centerImg {
     display:inline-block;
     height:auto;
     max-width: 100%;
-    }
-    
-    .detail .content *{
-    max-width: 100%;
-    word-break: break-all;
-    }
-    
-    .detail .content table {
-    width: 100%;
-    }
-    
-    .cont_title{
-    border-left:2px solid #4285F4;
-    padding-left:7px;
-    font-size:14px;
-    line-height: 15px !important;
-    margin-bottom: 20px;
-    }
-    
-    .cont_Line {
-    border-left:\(UIScreen.main.bounds.width + 40)px solid #EBEBF1;
-    line-height: 10px;
-    margin-left: -20px;
-    margin-bottom: 10px;
     }
     
     </style>
@@ -232,7 +181,11 @@ func htmlMake(content: String) -> String {
     
     let imgArr = document.getElementsByTagName('img');
     for (var i = 0; i <= imgArr.length - 1; i++) {
-        (imgArr[i]).className = 'contentimg';
+        (imgArr[i]).className = 'centerImg';
+        (imgArr[i]).onload = function() {
+            let height = document.body.scrollHeight;
+            window.webkit.messageHandlers.imagLoaded.postMessage(height);
+        }
     }
     
     </script>

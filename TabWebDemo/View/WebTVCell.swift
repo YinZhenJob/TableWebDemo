@@ -19,43 +19,33 @@ class WebTVCell: UITableViewCell {
     
     fileprivate lazy var webView: WKWebView = {
         let config = WKWebViewConfiguration()
+            config.preferences.javaScriptEnabled = true
+            config.userContentController.add(self, name: "imagLoaded")
         let web    = WKWebView(frame: CGRect(x: 0, y: 0, width: contentView.bounds.width, height: 100), configuration: config)
         web.navigationDelegate = self
         web.scrollView.isScrollEnabled = false
         web.translatesAutoresizingMaskIntoConstraints = false
-        web.addObserver(self, forKeyPath: "scrollView.contentSize", options: .new, context: nil)
-        web.addObserver(self, forKeyPath: "loading", options: .new, context: nil)
         return web
     }()
     
     deinit {
         webView.stopLoading()
-        webView.removeObserver(self, forKeyPath: "scrollView.contentSize")
-        webView.removeObserver(self, forKeyPath: "loading")
     }
 }
 
-extension WebTVCell: WKNavigationDelegate {
+extension WebTVCell: WKNavigationDelegate, WKScriptMessageHandler {
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        if message.name == "imagLoaded", let height = message.body as? CGFloat {
+            print("message name: \(message.name) height: \(height)")
+            heightAction?(height)
+        }
+    }
+    
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         webView.evaluateJavaScript("document.body.scrollHeight") { (heightValue, error) in
             guard let height = heightValue as? CGFloat else { return }
             print("Web Height: \(height)")
             self.heightAction?(height)
-        }
-    }
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "scrollView.contentSize", let newSize = change?[.newKey] as? CGSize {
-            print("new size: \(newSize)")
-//            self.heightAction?(newSize.height)
-        }
-        
-        if keyPath == "loading"{
-            webView.evaluateJavaScript("document.body.scrollHeight") { (heightValue, error) in
-                guard let height = heightValue as? CGFloat else { return }
-                print("Web loading Height: \(height)")
-                self.heightAction?(height)
-            }
         }
     }
 }
