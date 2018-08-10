@@ -23,8 +23,16 @@ class WebTVCell: UITableViewCell {
         web.navigationDelegate = self
         web.scrollView.isScrollEnabled = false
         web.translatesAutoresizingMaskIntoConstraints = false
+        web.addObserver(self, forKeyPath: "scrollView.contentSize", options: .new, context: nil)
+        web.addObserver(self, forKeyPath: "loading", options: .new, context: nil)
         return web
     }()
+    
+    deinit {
+        webView.stopLoading()
+        webView.removeObserver(self, forKeyPath: "scrollView.contentSize")
+        webView.removeObserver(self, forKeyPath: "loading")
+    }
 }
 
 extension WebTVCell: WKNavigationDelegate {
@@ -35,6 +43,21 @@ extension WebTVCell: WKNavigationDelegate {
             self.heightAction?(height)
         }
     }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "scrollView.contentSize", let newSize = change?[.newKey] as? CGSize {
+            print("new size: \(newSize)")
+//            self.heightAction?(newSize.height)
+        }
+        
+        if keyPath == "loading"{
+            webView.evaluateJavaScript("document.body.scrollHeight") { (heightValue, error) in
+                guard let height = heightValue as? CGFloat else { return }
+                print("Web loading Height: \(height)")
+                self.heightAction?(height)
+            }
+        }
+    }
 }
 
 extension WebTVCell {
@@ -43,7 +66,12 @@ extension WebTVCell {
         let textHash = text.hashValue
         guard textHash != htmlHash else { return }
         
-        webView.loadHTMLString(text, baseURL: nil)
+        if text.hasPrefix("http"), let url = URL(string: text)  {
+            webView.load(URLRequest(url: url))
+        } else {
+            webView.loadHTMLString(text, baseURL: nil)
+        }
+        
         self.heightAction = heightAction
         htmlHash = textHash
     }
@@ -53,7 +81,6 @@ extension WebTVCell {
         contentView.addSubview(webView)
         
         let vfDict = ["wv": webView]
-        
         
         addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[wv]|", options: [], metrics: nil, views: vfDict))
         addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[wv]|", options: [], metrics: nil, views: vfDict))

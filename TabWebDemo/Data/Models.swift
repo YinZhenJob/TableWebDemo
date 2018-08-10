@@ -14,14 +14,17 @@ struct ArticleModel {
     let title: String
     
     let img: String
+    
+    let content: String
 }
 
 
 extension ArticleModel {
     
     static func `default`() -> ArticleModel {
-        return ArticleModel(title: "他不相信上帝的恩宠，只相信上帝的惩罚",
-                            img: "fireSpace")
+        return ArticleModel(title: "《人间失格》",
+                            img: "01",
+                            content: htmlMake(content: html_01))
     }
 }
 
@@ -36,7 +39,7 @@ class CellModel {
     
     let type: CellE
     
-    let data: AnyObject
+    var data: AnyObject
     
     var height: CGFloat?
     
