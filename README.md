@@ -29,7 +29,7 @@ TableView 嵌套 WebView ，自适应屏幕宽度时三种 获取WebView真实�
 
 
 
-![主页面](~/WorkSpace/Blog/blog/source/_posts/iOS-中的那些富文本/detail.png)
+![主页面](./detail.png "主页面")
 
 
 
@@ -239,3 +239,5 @@ func userContentController(_ userContentController: WKUserContentController, did
 
 
 本文仅作为实际工程的应用，不涉及任何知识体系，想了解更多，请查看 [WebKit](https://github.com/WebKit/webkit) 的开源代码 ╮(╯_╰)╭。
+
+本人博文地址：yinzhen.tech
